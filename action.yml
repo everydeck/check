@@ -1,0 +1,29 @@
+# everydeck/check – vorbereitet in packages/everydeck-action, veröffentlicht von Daniel in der GitHub-Organisation everydeck (Repo everydeck/check, Tag v1).
+name: everydeck check
+description: Keeps everydeck working after every update – checks that every everydeck call is still in the code and sends the updated facts (never code) to everydeck.
+author: everydeck
+branding:
+  icon: check-circle
+  color: green
+inputs:
+  url:
+    description: Address of your everydeck
+    required: true
+  project:
+    description: Your everydeck project id
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: everydeck check
+      shell: bash
+      run: node "$GITHUB_ACTION_PATH/check.mjs"
+      env:
+        EVERYDECK_URL: ${{ inputs.url }}
+        EVERYDECK_PROJECT: ${{ inputs.project }}
