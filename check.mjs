@@ -36,7 +36,7 @@ if (!url || !/^https?:\/\//.test(url) || !/^[0-9a-f-]{36}$/i.test(project)) { an
 if (!existsSync(join(repo, BEFUND))) { annotate('notice', `${BEFUND} is not in this repository yet – nothing to check until everydeck is set up (your coding agent writes it).`); summary('### everydeck\n\nNothing to check yet: everydeck is not set up in this repository.'); finish(0); }
 
 // 1. Werkzeuge aus npm und PyPI in fester Version (B42), dieselben Fassungen, die das öffentliche Repo everydeck/everydeck veröffentlicht
-const TOOLS = { scaffold: { name: '@everydeck/check', version: '0.1.0' }, check: { name: 'everydeck-check', version: '0.1.0' } };
+const TOOLS = { scaffold: { name: '@everydeck/check', version: '0.2.0' }, check: { name: 'everydeck-check', version: '0.2.0' } };   // B46: vorbereitet (Fakt contact im Befund), nicht veröffentlicht
 let python = env.EVERYDECK_CHECK_PYTHON;
 if (!python) {
   const venv = join(tmp, 'venv');
