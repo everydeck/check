@@ -1,6 +1,6 @@
-# everydeck/check – vorbereitet in packages/everydeck-action, veröffentlicht von Daniel in der GitHub-Organisation everydeck (Repo everydeck/check, Tag v1).
+# everydeck/check: the everydeck GitHub Action (repository everydeck/check, tag v1).
 name: everydeck check
-description: Keeps everydeck working after every update – checks that every everydeck call is still in the code and sends the updated facts (never code) to everydeck.
+description: Keeps everydeck working after every update: checks that every everydeck call is still in the code and sends the updated facts (never code) to everydeck.
 author: everydeck
 branding:
   icon: check-circle
