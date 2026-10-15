@@ -37,7 +37,7 @@ if (!url || !/^https?:\/\//.test(url) || !/^[0-9a-f-]{36}$/i.test(project)) { an
 if (!existsSync(join(repo, APP_MAP))) { annotate('notice', `${APP_MAP} is not in this repository yet; nothing to check until everydeck is set up (your coding agent writes it).`); summary('### everydeck\n\nNothing to check yet: everydeck is not set up in this repository.'); finish(0); }
 
 // 1. Tools from npm and PyPI in a fixed version, the same versions the public repository everydeck/everydeck publishes
-const TOOLS = { scaffold: { name: '@everydeck/check', version: '0.3.1' }, check: { name: 'everydeck-check', version: '0.3.1' } };   // drift recognizes the relay from @everydeck/sdk
+const TOOLS = { scaffold: { name: '@everydeck/check', version: '0.3.2' }, check: { name: 'everydeck-check', version: '0.3.2' } };   // drift recognizes the relay from @everydeck/sdk
 let python = env.EVERYDECK_CHECK_PYTHON;
 if (!python) {
   const venv = join(tmp, 'venv');
