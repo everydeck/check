@@ -51,7 +51,7 @@ if (!url || !/^https?:\/\//.test(url) || !/^[0-9a-f-]{36}$/i.test(project)) { an
 if (!existsSync(join(repo, APP_MAP))) { annotate('notice', `${APP_MAP} is not in this repository yet; nothing to check until everydeck is set up (your coding agent writes it).`); summary('### everydeck\n\nNothing to check yet: everydeck is not set up in this repository.'); finish(0); }
 
 // 1. Tools from npm and PyPI in a fixed version, the same versions the public repository everydeck/everydeck publishes
-const TOOLS = { scaffold: { name: '@everydeck/check', version: '0.3.20' }, check: { name: 'everydeck-check', version: '0.3.20' } };   // 0.3.20: false_positive per place, places and form on open parts, photo addresses (columns[].image_src), when reports, review queues and requests are done, a job without heartbeat is a note and a schedule in SQL needs none; 0.3.19: the inventory names where the app's own server reads its settings
+const TOOLS = { scaffold: { name: '@everydeck/check', version: '0.3.21' }, check: { name: 'everydeck-check', version: '0.3.21' } };   // 0.3.21: tables the app empties itself (row_deletes); 0.3.20: false_positive per place, places and form on open parts, photo addresses (columns[].image_src), when reports, review queues and requests are done, a job without heartbeat is a note and a schedule in SQL needs none; 0.3.19: the inventory names where the app's own server reads its settings
 let python = env.EVERYDECK_CHECK_PYTHON;
 const pyEnv = {};
 const tools = join(tmp, 'tools');
