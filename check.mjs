@@ -17,7 +17,7 @@
  * `paths` changes; this script says when a file with an everydeck call is not in that list, and how long each part of the run took.
  */
 import { spawn, spawnSync } from 'node:child_process';
-import { appendFileSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, copyFileSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { covers, globOf, watchedFiles, workflowFile } from './paths.mjs';
@@ -51,7 +51,7 @@ if (!url || !/^https?:\/\//.test(url) || !/^[0-9a-f-]{36}$/i.test(project)) { an
 if (!existsSync(join(repo, APP_MAP))) { annotate('notice', `${APP_MAP} is not in this repository yet; nothing to check until everydeck is set up (your coding agent writes it).`); summary('### everydeck\n\nNothing to check yet: everydeck is not set up in this repository.'); finish(0); }
 
 // 1. Tools from npm and PyPI in a fixed version, the same versions the public repository everydeck/everydeck publishes
-const TOOLS = { scaffold: { name: '@everydeck/check', version: '0.3.22' }, check: { name: 'everydeck-check', version: '0.3.22' } };   // 0.3.22: no other worktrees or ignored folders in the scan, tables never from test scripts, what a review queue counts as open, its reason in the app's words, the pair and the page of the app; 0.3.21: tables the app empties itself (row_deletes); 0.3.20: false_positive per place, places and form on open parts, photo addresses (columns[].image_src), when reports, review queues and requests are done, a job without heartbeat is a note and a schedule in SQL needs none; 0.3.19: the inventory names where the app's own server reads its settings
+const TOOLS = { scaffold: { name: '@everydeck/check', version: '0.3.23' }, check: { name: 'everydeck-check', version: '0.3.23' } };   // 0.3.23: why the rows of a flow are its runs and who did them (result.write.attribution); 0.3.22: no other worktrees or ignored folders in the scan, tables never from test scripts, what a review queue counts as open, its reason in the app's words, the pair and the page of the app; 0.3.21: tables the app empties itself (row_deletes); 0.3.20: false_positive per place, places and form on open parts, photo addresses (columns[].image_src), when reports, review queues and requests are done, a job without heartbeat is a note and a schedule in SQL needs none; 0.3.19: the inventory names where the app's own server reads its settings
 let python = env.EVERYDECK_CHECK_PYTHON;
 const pyEnv = {};
 const tools = join(tmp, 'tools');
@@ -90,12 +90,15 @@ if (!reanchor || reanchor.error) annotate('warning', `places of the app map were
 const merged = join(tmp, 'app-map.json');
 const sk = run(process.execPath, [skeleton, '.', '--merge', existsSync(anchored) ? anchored : join(repo, APP_MAP), '--out', merged], { env: nodeEnv });
 if (sk.status !== 0 || !existsSync(merged)) { annotate('error', `the everydeck skeleton failed: ${(sk.stderr || '').slice(-400)}`); finish(1); }
-const map = JSON.parse(readFileSync(merged, 'utf8'));
 lap('app map');
 
 // 3. Is every everydeck call still there?
-// drift and validate read the same files and nothing of each other: at the same time
-const [driftRun, validateRun] = await Promise.all([runAsync(python, ['-m', 'everydeck_check.cli', 'drift', merged, '--repo', '.'], { env: nodeEnv }), runAsync(python, ['-m', 'everydeck_check.cli', 'validate', merged, '--repo', '.'], { env: nodeEnv })]);
+// drift and validate at the same time; drift reads its own copy, because validate writes into the app map
+const forDrift = join(tmp, 'app-map.drift.json'); copyFileSync(merged, forDrift);
+const [driftRun, validateRun] = await Promise.all([runAsync(python, ['-m', 'everydeck_check.cli', 'drift', forDrift, '--repo', '.'], { env: nodeEnv }), runAsync(python, ['-m', 'everydeck_check.cli', 'validate', merged, '--repo', '.'], { env: nodeEnv })]);
+// everydeck gets the app map as validate --repo left it, with the inventory of this commit and the jobs[] entries it writes itself (a new
+// pg_cron schedule); before, the guard read the app map before validate, and what validate wrote never reached everydeck
+const map = JSON.parse(readFileSync(merged, 'utf8'));
 const dr = jsonOf(driftRun);
 if (!dr) { annotate('error', 'everydeck-check drift did not answer'); finish(1); }
 const flowOf = (sig) => (map.flows ?? []).find((f) => (f.signals ?? []).some((s) => s.name === sig))?.id;
